@@ -2,37 +2,12 @@ import os
 
 def get_xmas(fileName):
   file_contents = get_file_contents(fileName)
-  to_find = "XMAS"
+  to_find = "MAS"
   
   total = 0
   
-  total += find_horizontal(file_contents, to_find)
-  total += find_vertical(file_contents, to_find)
   total += find_diagonal(file_contents, to_find)
   
-  return total
-
-def find_horizontal(body, to_find):
-  total = 0
-  
-  reversed_to_find = to_find[::-1]
-  
-  total += body.count(to_find)
-  total += body.count(reversed_to_find)
-  
-  return total
-
-def find_vertical(body, to_find):
-  total = 0
-  
-  matrix = get_matrix(body)
-  
-  def condition(prev_match_row, prev_match_col, row, col):
-    return prev_match_col == col and row == prev_match_row + 1
-  
-  total += recursive_find(matrix, to_find, condition)
-  total += recursive_find(matrix, to_find[::-1], condition)
-    
   return total
 
 def find_diagonal(body, to_find):
@@ -48,50 +23,53 @@ def find_diagonal(body, to_find):
   
   # Search for XMAS
   # Top to bottom, right
-  total += recursive_find(matrix, to_find, top_bottom_right_condition)
-  # Top to bottom, left
-  total += recursive_find(matrix, to_find, top_bottom_left_condition)
+  # total += recursive_find(matrix, to_find, top_bottom_right_condition)
+  # # Top to bottom, left
+  # total += recursive_find(matrix, to_find, top_bottom_left_condition)
   
-  # Search for SAMX 
-  # Bottom to top, left
-  total += recursive_find(matrix, to_find[::-1], top_bottom_right_condition)
-  # Bottom to top, right
-  total += recursive_find(matrix, to_find[::-1], top_bottom_left_condition)
+  # # Search for SAMX 
+  # # Bottom to top, left
+  # total += recursive_find(matrix, to_find[::-1], top_bottom_right_condition)
+  # # Bottom to top, right
+  # total += recursive_find(matrix, to_find[::-1], top_bottom_left_condition)
+  
+  total += recursive_find(matrix)
   
   return total
 
-def recursive_find(matrix, to_find, condition, start_row=0, start_col=0):
+def recursive_find(matrix):
   found_words = 0
   
   for matrix_item in matrix:
-    word = ""
-    
-    if matrix_item.get("char") == to_find[0]:  
-      word += matrix_item.get("char")
+    if matrix_item.get("char") == "A":
+      row_index = matrix_item.get("row")
+      col_index = matrix_item.get("col")
       
-      next_item = [item for item in matrix if 
-        condition(matrix_item.get("row"), matrix_item.get("col"), item.get("row"), item.get("col"))]
+      left_top = [item for item in matrix if item.get("row") == row_index - 1 and item.get("col") == col_index - 1]
+      right_top = [item for item in matrix if item.get("row") == row_index - 1 and item.get("col") == col_index + 1]
+      left_bottom = [item for item in matrix if item.get("row") == row_index + 1 and item.get("col") == col_index - 1]
+      right_bottom = [item for item in matrix if item.get("row") == row_index + 1 and item.get("col") == col_index + 1]
       
-      if next_item and next_item[0].get("char") == to_find[1]:
-        word += next_item[0].get("char")
-        start_row = next_item[0].get("row")
-        start_col = next_item[0].get("col")
+      # find M** in previous line
+      if left_top and right_top and left_bottom and right_bottom:
+        if left_top[0].get("char") == "M" and right_bottom[0].get("char") == "S" and left_bottom[0].get("char") == "M" and right_top[0].get("char") == "S":
+          found_words += 1
+        elif left_top[0].get("char") == "M" and right_bottom[0].get("char") == "S" and left_bottom[0].get("char") == "S" and right_top[0].get("char") == "M":
+          found_words += 1
+        elif left_top[0].get("char") == "S" and right_bottom[0].get("char") == "M" and left_bottom[0].get("char") == "M" and right_top[0].get("char") == "S":
+          found_words += 1
+        elif left_top[0].get("char") == "S" and right_bottom[0].get("char") == "M" and left_bottom[0].get("char") == "S" and right_top[0].get("char") == "M":
+          found_words += 1
+      
+      # if next_item and next_item[0].get("char") == to_find[1]:
+      #   start_row = next_item[0].get("row")
+      #   start_col = next_item[0].get("col")
         
-        next_item = [item for item in matrix if 
-          condition(start_row, start_col, item.get("row"), item.get("col"))]
+      #   next_item = [item for item in matrix if 
+      #     condition(start_row, start_col, item.get("row"), item.get("col"))]
         
-        if next_item and next_item[0].get("char") == to_find[2]:
-          word += next_item[0].get("char")
-          start_row = next_item[0].get("row")
-          start_col = next_item[0].get("col")
-          
-          next_item = [item for item in matrix if 
-            condition(start_row, start_col, item.get("row"), item.get("col"))]
-        
-          if next_item and next_item[0].get("char") == to_find[3]:
-            word += next_item[0].get("char")
-            found_words += 1
-  
+      #   if next_item and next_item[0].get("char") == to_find[2]:
+      #     found_words += 1
    
   return found_words     
 

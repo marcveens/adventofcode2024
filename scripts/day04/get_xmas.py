@@ -40,19 +40,23 @@ def find_diagonal(body, to_find):
   
   matrix = get_matrix(body)
   
-  def forward_condition(prev_match_row, prev_match_col, row, col):
+  def top_bottom_right_condition(prev_match_row, prev_match_col, row, col):
     return prev_match_col + 1 == col and row == prev_match_row + 1
   
-  def reverse_condition(prev_match_row, prev_match_col, row, col):
-    return prev_match_col - 1 == col and row == prev_match_row - 1
+  def top_bottom_left_condition(prev_match_row, prev_match_col, row, col):
+    return prev_match_col - 1 == col and row == prev_match_row + 1
   
   # Search for XMAS
-  total += recursive_find(matrix, to_find, forward_condition)
-  total += recursive_find(list(reversed(matrix)), to_find, reverse_condition)
+  # Top to bottom, right
+  total += recursive_find(matrix, to_find, top_bottom_right_condition)
+  # Top to bottom, left
+  total += recursive_find(matrix, to_find, top_bottom_left_condition)
   
-  # # Search for SAMX 
-  total += recursive_find(matrix, to_find[::-1], forward_condition)
-  total += recursive_find(list(reversed(matrix)), to_find[::-1], reverse_condition)
+  # Search for SAMX 
+  # Bottom to top, left
+  total += recursive_find(matrix, to_find[::-1], top_bottom_right_condition)
+  # Bottom to top, right
+  total += recursive_find(matrix, to_find[::-1], top_bottom_left_condition)
   
   return total
 
@@ -67,8 +71,6 @@ def recursive_find(matrix, to_find, condition, start_row=0, start_col=0):
       
       next_item = [item for item in matrix if 
         condition(matrix_item.get("row"), matrix_item.get("col"), item.get("row"), item.get("col"))]
-      
-      print(f"next item {next_item} {to_find[1]}")
       
       if next_item and next_item[0].get("char") == to_find[1]:
         word += next_item[0].get("char")
@@ -88,7 +90,6 @@ def recursive_find(matrix, to_find, condition, start_row=0, start_col=0):
         
           if next_item and next_item[0].get("char") == to_find[3]:
             word += next_item[0].get("char")
-            print(f"word: {word}")
             found_words += 1
   
    

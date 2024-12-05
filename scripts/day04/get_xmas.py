@@ -1,7 +1,7 @@
 import os
 
-def get_xmas(fileName):
-  file_contents = get_file_contents(fileName)
+def get_xmas(file_name):
+  file_contents = get_file_contents(file_name)
   to_find = "MAS"
   
   total = 0
